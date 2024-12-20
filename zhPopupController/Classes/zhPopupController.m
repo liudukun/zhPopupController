@@ -15,7 +15,7 @@
     BOOL _directionalVertical;
     BOOL _isDirectionLocked;
 }
-@property (nonatomic, strong) UIView *maskView;
+@property (nonatomic, strong) UIView *maskViewA;
 @property (nonatomic, weak) UIView *proxyView;
 
 @end
@@ -66,7 +66,7 @@
              completion:(void (^)(void))completion {
     if (self.isPresenting) return;
     
-    self.maskView.alpha = 0;
+    self.maskViewA.alpha = 0;
     [self prepareSlideStyle];
     self.view.center = [self prepareCenter];
     
@@ -99,7 +99,7 @@
         }
         
         [UIView animateWithDuration:duration delay:delay options:options animations:^{
-            self.maskView.alpha = 1;
+            self.maskViewA.alpha = 1;
             [self finalSlideStyle];
         } completion:^(BOOL finished) {
             finishedCallback();
@@ -116,7 +116,7 @@
         
         if (isBounced) {
             [UIView animateWithDuration:duration * 0.25 delay:delay options:options animations:^{
-                self.maskView.alpha = 1;
+                self.maskViewA.alpha = 1;
             } completion:NULL];
             
             [UIView animateWithDuration:duration delay:delay usingSpringWithDamping:0.6 initialSpringVelocity:0.25 options:options animations:^{
@@ -127,7 +127,7 @@
             }];
         } else {
             [UIView animateWithDuration:duration delay:delay options:options animations:^{
-                self.maskView.alpha = 1;
+                self.maskViewA.alpha = 1;
                 [self finalSlideStyle];
                 self.view.center =  [self finalCenter];
             } completion:^(BOOL finished) {
@@ -154,7 +154,7 @@
     [UIView animateWithDuration:duration delay:delay options:options animations:^{
         [self dismissSlideStyle];
         self.view.center = [self dismissedCenter];
-        self.maskView.alpha = 0;
+        self.maskViewA.alpha = 0;
     } completion:^(BOOL finished) {
         [self finalSlideStyle];
         [self removeSubviews];
@@ -182,18 +182,18 @@
 }
 
 - (void)addSubviewBelow:(UIView *)subview {
-    [self.proxyView insertSubview:self.maskView belowSubview:subview];
-    [self.proxyView insertSubview:self.view aboveSubview:self.maskView];
+    [self.proxyView insertSubview:self.maskViewA belowSubview:subview];
+    [self.proxyView insertSubview:self.view aboveSubview:self.maskViewA];
 }
 
 - (void)addSubview {
-    [self.proxyView addSubview:self.maskView];
+    [self.proxyView addSubview:self.maskViewA];
     [self.proxyView addSubview:self.view];
 }
 
 - (void)removeSubviews {
     [_view removeFromSuperview];
-    [_maskView removeFromSuperview];
+    [_maskViewA removeFromSuperview];
 }
 
 - (void)prepareSlideStyle {
@@ -248,9 +248,9 @@
                                [self finalCenter].y);
         case zhPopupSlideStyleFromBottom:
             return CGPointMake([self finalCenter].x,
-                               self.maskView.bounds.size.height + self.view.bounds.size.height / 2);
+                               self.maskViewA.bounds.size.height + self.view.bounds.size.height / 2);
         case zhPopupSlideStyleFromRight:
-            return CGPointMake(self.maskView.bounds.size.width + self.view.bounds.size.width / 2,
+            return CGPointMake(self.maskViewA.bounds.size.width + self.view.bounds.size.width / 2,
                                [self finalCenter].y);
         default:
             return [self finalCenter];
@@ -260,66 +260,66 @@
 - (CGPoint)finalCenter {
     switch (self.layoutType) {
         case zhPopupLayoutTypeTop:
-            return CGPointMake(self.maskView.center.x,
+            return CGPointMake(self.maskViewA.center.x,
                                self.view.bounds.size.height / 2 + self.offsetSpacing);
         case zhPopupLayoutTypeLeft:
             return CGPointMake(self.view.bounds.size.width / 2 + self.offsetSpacing,
-                               self.maskView.center.y);
+                               self.maskViewA.center.y);
         case zhPopupLayoutTypeBottom:
-            return CGPointMake(self.maskView.center.x,
-                               self.maskView.bounds.size.height - self.view.bounds.size.height / 2 - self.offsetSpacing);
+            return CGPointMake(self.maskViewA.center.x,
+                               self.maskViewA.bounds.size.height - self.view.bounds.size.height / 2 - self.offsetSpacing);
         case zhPopupLayoutTypeRight:
-            return CGPointMake(self.maskView.bounds.size.width - self.view.bounds.size.width / 2 - self.offsetSpacing,
-                               self.maskView.center.y);
+            return CGPointMake(self.maskViewA.bounds.size.width - self.view.bounds.size.width / 2 - self.offsetSpacing,
+                               self.maskViewA.center.y);
         case zhPopupLayoutTypeCenter:
             /// only adjust center.y
-            return CGPointMake(self.maskView.center.x, self.maskView.center.y + self.offsetSpacing);
+            return CGPointMake(self.maskViewA.center.x, self.maskViewA.center.y + self.offsetSpacing);
         default: break;
     }
 }
 
-- (UIView *)maskView {
-    if (!_maskView) {
-        _maskView = [[UIView alloc] initWithFrame:self.proxyView.bounds];
+- (UIView *)maskViewA {
+    if (!_maskViewA) {
+        _maskViewA = [[UIView alloc] initWithFrame:self.proxyView.bounds];
         switch (self.maskType) {
             case zhPopupMaskTypeDarkBlur: {
                 UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
                 UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:effect];
-                blurView.frame = _maskView.bounds;
-                [_maskView insertSubview:blurView atIndex:0];
+                blurView.frame = _maskViewA.bounds;
+                [_maskViewA insertSubview:blurView atIndex:0];
             } break;
             case zhPopupMaskTypeLightBlur: {
                 UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
                 UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:effect];
-                blurView.frame = _maskView.bounds;
-                [_maskView insertSubview:blurView atIndex:0];
+                blurView.frame = _maskViewA.bounds;
+                [_maskViewA insertSubview:blurView atIndex:0];
             } break;
             case zhPopupMaskTypeExtraLightBlur: {
                 UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
                 UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:effect];
-                blurView.frame = _maskView.bounds;
-                [_maskView insertSubview:blurView atIndex:0];
+                blurView.frame = _maskViewA.bounds;
+                [_maskViewA insertSubview:blurView atIndex:0];
             } break;
             case zhPopupMaskTypeWhite: {
-                _maskView.backgroundColor = [UIColor whiteColor];
+                _maskViewA.backgroundColor = [UIColor whiteColor];
             } break;
             case zhPopupMaskTypeClear: {
-                _maskView.backgroundColor = [UIColor clearColor];
+                _maskViewA.backgroundColor = [UIColor clearColor];
             } break;
             case zhPopupMaskTypeBlackOpacity: {
-                _maskView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:self.maskAlpha];
+                _maskViewA.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:self.maskAlpha];
             } break;
             default: break;
         }
         UITapGestureRecognizer *tap  = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
         tap.delegate = self;
-        [_maskView addGestureRecognizer:tap];
+        [_maskViewA addGestureRecognizer:tap];
         if (self.panGestureEnabled) {
             UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
             [self.view addGestureRecognizer:pan];
         }
     }
-    return _maskView;
+    return _maskViewA;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -339,7 +339,7 @@
 
 - (void)handlePan:(UIPanGestureRecognizer *)g {
     if (_isKeyboardVisible || !self.panGestureEnabled) return;
-    CGPoint p = [g translationInView:self.maskView];
+    CGPoint p = [g translationInView:self.maskViewA];
     
     switch (g.state) {
         case UIGestureRecognizerStateBegan:
@@ -354,7 +354,7 @@
                     } else {
                         g.view.center = [self finalCenter];
                     }
-                    self.maskView.alpha = CGRectGetMaxY(g.view.frame) / boundary;
+                    self.maskViewA.alpha = CGRectGetMaxY(g.view.frame) / boundary;
                 } break;
                 case zhPopupLayoutTypeLeft: {
                     CGFloat boundary = g.view.bounds.size.width + self.offsetSpacing;
@@ -363,32 +363,32 @@
                     } else {
                         g.view.center = [self finalCenter];
                     }
-                    self.maskView.alpha = CGRectGetMaxX(g.view.frame) / boundary;
+                    self.maskViewA.alpha = CGRectGetMaxX(g.view.frame) / boundary;
                 } break;
                 case zhPopupLayoutTypeBottom: {
-                    CGFloat boundary = self.maskView.bounds.size.height - g.view.bounds.size.height - self.offsetSpacing;
+                    CGFloat boundary = self.maskViewA.bounds.size.height - g.view.bounds.size.height - self.offsetSpacing;
                     if ((g.view.frame.origin.y + p.y) > boundary) {
                         g.view.center = CGPointMake(g.view.center.x, g.view.center.y + p.y);
                     } else {
                         g.view.center = [self finalCenter];
                     }
-                    self.maskView.alpha = 1 - (CGRectGetMinY(g.view.frame) - boundary) / (self.maskView.bounds.size.height - boundary);
+                    self.maskViewA.alpha = 1 - (CGRectGetMinY(g.view.frame) - boundary) / (self.maskViewA.bounds.size.height - boundary);
                 } break;
                 case zhPopupLayoutTypeRight: {
-                    CGFloat boundary = self.maskView.bounds.size.width - g.view.bounds.size.width - self.offsetSpacing;
+                    CGFloat boundary = self.maskViewA.bounds.size.width - g.view.bounds.size.width - self.offsetSpacing;
                     if ((CGRectGetMinX(g.view.frame) + p.x) > boundary) {
                         g.view.center = CGPointMake(g.view.center.x + p.x, g.view.center.y);
                     } else {
                         g.view.center = [self finalCenter];
                     }
-                    self.maskView.alpha = 1 - (CGRectGetMinX(g.view.frame) - boundary) / (self.maskView.bounds.size.width - boundary);
+                    self.maskViewA.alpha = 1 - (CGRectGetMinX(g.view.frame) - boundary) / (self.maskViewA.bounds.size.width - boundary);
                 } break;
                 case zhPopupLayoutTypeCenter: {
                     [self directionalLock:p];
                     if (_directionalVertical) {
                         g.view.center = CGPointMake(g.view.center.x, g.view.center.y + p.y);
-                        CGFloat boundary = self.maskView.bounds.size.height / 2 + self.offsetSpacing - g.view.bounds.size.height / 2;
-                        self.maskView.alpha = 1 - (CGRectGetMinY(g.view.frame) - boundary) / (self.maskView.bounds.size.height - boundary);
+                        CGFloat boundary = self.maskViewA.bounds.size.height / 2 + self.offsetSpacing - g.view.bounds.size.height / 2;
+                        self.maskViewA.alpha = 1 - (CGRectGetMinY(g.view.frame) - boundary) / (self.maskViewA.bounds.size.height - boundary);
                     } else {
                         [self directionalUnlock]; // todo...
                     }
@@ -396,7 +396,7 @@
                 default: break;
             }
             
-            [g setTranslation:CGPointZero inView:self.maskView];
+            [g setTranslation:CGPointZero inView:self.maskViewA];
         } break;
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateFailed:
@@ -405,20 +405,20 @@
             BOOL isDismissNeeded = NO;
             switch (self.layoutType) {
                 case zhPopupLayoutTypeTop: {
-                    isDismissNeeded = CGRectGetMaxY(g.view.frame) < self.maskView.bounds.size.height * self.panDismissRatio;
+                    isDismissNeeded = CGRectGetMaxY(g.view.frame) < self.maskViewA.bounds.size.height * self.panDismissRatio;
                 } break;
                 case zhPopupLayoutTypeLeft: {
-                    isDismissNeeded = CGRectGetMaxX(g.view.frame) < self.maskView.bounds.size.width * self.panDismissRatio;
+                    isDismissNeeded = CGRectGetMaxX(g.view.frame) < self.maskViewA.bounds.size.width * self.panDismissRatio;
                 } break;
                 case zhPopupLayoutTypeBottom: {
-                    isDismissNeeded = CGRectGetMinY(g.view.frame) > self.maskView.bounds.size.height * self.panDismissRatio;
+                    isDismissNeeded = CGRectGetMinY(g.view.frame) > self.maskViewA.bounds.size.height * self.panDismissRatio;
                 } break;
                 case zhPopupLayoutTypeRight: {
-                    isDismissNeeded = CGRectGetMinX(g.view.frame) > self.maskView.bounds.size.width * self.panDismissRatio;
+                    isDismissNeeded = CGRectGetMinX(g.view.frame) > self.maskViewA.bounds.size.width * self.panDismissRatio;
                 } break;
                 case zhPopupLayoutTypeCenter: {
                     if (_directionalVertical) {
-                        isDismissNeeded = CGRectGetMinY(g.view.frame) > self.maskView.bounds.size.height * self.panDismissRatio;
+                        isDismissNeeded = CGRectGetMinY(g.view.frame) > self.maskViewA.bounds.size.height * self.panDismissRatio;
                         [self directionalUnlock];
                     }
                 } break;
@@ -431,7 +431,7 @@
                 }
             } else {
                 [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-                    self.maskView.alpha = 1;
+                    self.maskViewA.alpha = 1;
                     g.view.center = [self finalCenter];
                 } completion:NULL];
             }
@@ -490,8 +490,8 @@
     CGRect frameBegin = [u[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
     CGRect frameEnd = [u[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     if (frameBegin.size.height > 0 && ABS(CGRectGetMinY(frameBegin) - CGRectGetMinY(frameEnd))) {
-        CGRect frameConverted = [self.maskView convertRect:frameEnd fromView:nil];
-        CGFloat keyboardHeightConverted = self.maskView.bounds.size.height - CGRectGetMinY(frameConverted);
+        CGRect frameConverted = [self.maskViewA convertRect:frameEnd fromView:nil];
+        CGFloat keyboardHeightConverted = self.maskViewA.bounds.size.height - CGRectGetMinY(frameConverted);
         if (keyboardHeightConverted > 0) {
             _isKeyboardVisible = YES;
         
@@ -548,7 +548,7 @@ static void *UIViewzhPopupControllersKey = &UIViewzhPopupControllersKey;
         } else {
             for (zhPopupController *element in _popupControllers) {
                 if (popupController.windowLevel < element.windowLevel) {
-                    [popupController addSubviewBelow:element.maskView];
+                    [popupController addSubviewBelow:element.maskViewA];
                     break;
                 }
             }
