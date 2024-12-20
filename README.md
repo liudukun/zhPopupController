@@ -34,7 +34,7 @@ use_frameworks!
 
 target 'You Project' do
     
-	pod 'zhPopupController', '~> 2.0'
+	pod 'zhPopupController', :git=>'https://github.com/liudukun/zhPopupController.git'
     
 end
 ```
